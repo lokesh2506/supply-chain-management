@@ -1,18 +1,13 @@
 @import "tailwindcss";
+@import "tailwindcss/preflight";
 
-:root {
-  
+@tailwind utilities;
+
+.animate-fly {
+  animation: fly 5s linear infinite;
 }
 
-@theme inline {
-  
-}
-
-@media (prefers-color-scheme: dark) {
-  
-}
-
-body {
-  
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes fly {
+  0% { transform: translateX(-100vw); }
+  100% { transform: translateX(100vw); }
 }
