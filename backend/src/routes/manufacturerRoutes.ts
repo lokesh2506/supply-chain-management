@@ -1,3 +1,4 @@
+// supply-chain-management/backend/src/routes/manufacturerRoutes.ts
 import { Router } from 'express';
 import { getOrders, placeOrder, makePayment } from '../controllers/manufacturerController';
 import authMiddleware from '../middleware/auth';
@@ -5,7 +6,7 @@ import authMiddleware from '../middleware/auth';
 const router = Router();
 
 router.get('/orders', authMiddleware, getOrders);
-router.post('/orders', authMiddleware, placeOrder);
-router.post('/payments', authMiddleware, makePayment);
+router.post('/placeOrder', authMiddleware, placeOrder);
+router.post('/makePayment', authMiddleware, makePayment);
 
 export default router;

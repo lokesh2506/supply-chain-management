@@ -1,13 +1,13 @@
-'use client';
-import { useContext, useState } from 'react';
-import { useRouter } from 'next/router';
-import { AuthContext } from '../../context/AuthContext';
-import { Select, MenuItem, Button, FormControl, InputLabel, Box, Typography } from '@mui/material';
+"use client";
+import { useContext, useState } from "react";
+import { useRouter } from "next/navigation"; // Change from next/router
+import { AuthContext } from "../../context/AuthContext";
+import { Select, MenuItem, Button, FormControl, InputLabel, Box, Typography } from "@mui/material";
 
 export default function Login() {
   const authContext = useContext(AuthContext);
   const router = useRouter();
-  const [selectedRole, setSelectedRole] = useState<string>('');
+  const [selectedRole, setSelectedRole] = useState<string>("");
 
   if (!authContext) return null;
 
@@ -15,21 +15,19 @@ export default function Login() {
 
   const handleLogin = async () => {
     if (!selectedRole) {
-      alert('Please select a role');
+      alert("Please select a role");
       return;
     }
     const success = await connectWallet(selectedRole);
     if (success) {
-      router.push('/vineet');
+      router.push("/vineet"); // Use push from next/navigation
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <Box sx={{ bgcolor: 'white', p: 4, borderRadius: 2, boxShadow: 3 }}>
-        <Typography variant="h5" gutterBottom>
-          Login
-        </Typography>
+      <Box sx={{ bgcolor: "white", p: 4, borderRadius: 2, boxShadow: 3 }}>
+        <Typography variant="h5" gutterBottom>Login</Typography>
         <FormControl fullWidth sx={{ mb: 2 }}>
           <InputLabel>Select Role</InputLabel>
           <Select

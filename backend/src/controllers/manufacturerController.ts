@@ -1,56 +1,37 @@
+// supply-chain-management/backend/src/controllers/manufacturerController.ts
 import { Request, Response } from 'express';
-import Order from '../models/Order';
-import { ethers } from 'ethers';
-import SupplyChain from '../../artifacts/contracts/SupplyChain.sol/SupplyChain.json';
+import { callContractMethod, getContractData } from '../utils/blockchain';
+import { ethers } from 'ethers'; // Add this import for parseEther
 
-const contractAddress = process.env.CONTRACT_ADDRESS || 'YOUR_CONTRACT_ADDRESS';
+export const placeOrder = async (req: Request, res: Response) => {
+  const { id, materialName, quantity, deliveryAddress, price, supplier } = req.body;
+  const walletAddress = req.query.walletAddress as string;
+
+  try {
+    await callContractMethod('placeOrder', [id, materialName, quantity, deliveryAddress, price, supplier], walletAddress);
+    res.status(201).json({ message: 'Order placed', orderId: id });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to place order' });
+  }
+};
 
 export const getOrders = async (req: Request, res: Response) => {
+  const walletAddress = req.query.walletAddress as string;
   try {
-    const orders = await Order.find({ manufacturer: req.query.walletAddress });
+    const orders = await getContractData('getOrders', [walletAddress], walletAddress);
     res.json(orders);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch orders' });
   }
 };
 
-export const placeOrder = async (req: Request, res: Response) => {
-  const { id, materialName, quantity, deliveryAddress, price, supplier } = req.body;
-
-  try {
-    const order = new Order({
-      id,
-      materialName,
-      quantity,
-      manufacturer: req.body.walletAddress,
-      deliveryAddress,
-      price,
-      supplier,
-    });
-    await order.save();
-
-    const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL || 'http://localhost:8545');
-    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY || 'YOUR_PRIVATE_KEY', provider);
-    const contract = new ethers.Contract(contractAddress, SupplyChain.abi, wallet);
-    await contract.placeOrder(id, materialName, quantity, deliveryAddress, price, supplier);
-
-    res.json(order);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to place order' });
-  }
-};
-
 export const makePayment = async (req: Request, res: Response) => {
   const { orderId, toAddress, amount } = req.body;
-
+  const walletAddress = req.query.walletAddress as string;
   try {
-    const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL || 'http://localhost:8545');
-    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY || 'YOUR_PRIVATE_KEY', provider);
-    const contract = new ethers.Contract(contractAddress, SupplyChain.abi, wallet);
-    const tx = await contract.makePayment(orderId, toAddress, { value: ethers.utils.parseEther(amount) });
-
-    res.json({ transactionHash: tx.hash });
+    await callContractMethod('makePayment', [orderId, toAddress], walletAddress, ethers.utils.parseEther(amount));
+    res.status(200).json({ message: 'Payment processed', orderId });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to make payment' });
+    res.status(500).json({ error: 'Failed to process payment' });
   }
 };

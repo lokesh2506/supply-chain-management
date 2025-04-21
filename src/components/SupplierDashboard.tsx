@@ -1,7 +1,16 @@
-'use client';
-import { useState, useEffect } from 'react';
-import Header from './Header';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
+"use client";
+import { useState, useEffect } from "react";
+import Header from "./Header";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+} from "@mui/material";
 
 interface Order {
   id: string;
@@ -45,36 +54,42 @@ const SupplierDashboard: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch data from backend
     const fetchData = async () => {
-      const walletAddress = localStorage.getItem('walletAddress');
-      const resMaterials = await fetch(`/api/supplier/materials?walletAddress=${walletAddress}`);
-      const resOrders = await fetch(`/api/manufacturer/orders?walletAddress=${walletAddress}`);
-      const resDeliveries = await fetch(`/api/deliveries?walletAddress=${walletAddress}`);
-      const resTransactions = await fetch(`/api/transactions?walletAddress=${walletAddress}`);
-      setMaterials(await resMaterials.json());
-      setOrders(await resOrders.json());
-      setDeliveries(await resDeliveries.json());
-      setTransactions(await resTransactions.json());
+      const walletAddress = localStorage.getItem("walletAddress");
+      if (!walletAddress) {
+        setError("No wallet address found in localStorage");
+        return;
+      }
+
+      try {
+        const resMaterials = await fetch(`/api/supplier/materials?walletAddress=${walletAddress}`);
+        if (!resMaterials.ok) throw new Error(`Materials fetch failed: ${resMaterials.status}`);
+        const resOrders = await fetch(`/api/manufacturer/orders?walletAddress=${walletAddress}`);
+        if (!resOrders.ok) throw new Error(`Orders fetch failed: ${resOrders.status}`);
+        const resDeliveries = await fetch(`/api/supplier/deliveries?walletAddress=${walletAddress}`); // Fixed URL
+        if (!resDeliveries.ok) throw new Error(`Deliveries fetch failed: ${resDeliveries.status}`);
+        const resTransactions = await fetch(`/api/supplier/transactions?walletAddress=${walletAddress}`); // Adjusted URL
+        if (!resTransactions.ok) throw new Error(`Transactions fetch failed: ${resTransactions.status}`);
+
+        setMaterials(await resMaterials.json());
+        setOrders(await resOrders.json());
+        setDeliveries(await resDeliveries.json());
+        setTransactions(await resTransactions.json());
+      } catch (error) {
+        setError(error instanceof Error ? error.message : "Unknown error occurred");
+        console.error("Fetch error:", error);
+      }
     };
+
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const fetchMaterials = async () => {
-      try {
-        const walletAddress = localStorage.getItem('walletAddress');
-        const res = await fetch(`/api/supplier/materials?walletAddress=${walletAddress}`);
-        const data = await res.json();
-        setMaterials(data); // Assuming setMaterials is defined in state
-      } catch (error) {
-        console.error('Error fetching materials:', error);
-      }
-    };
-    fetchMaterials();
-  }, []);
+  if (error) {
+    return <div>Error: {error}</div>; // Display error to user
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -143,7 +158,7 @@ const SupplierDashboard: React.FC = () => {
                   <TableCell>{material.quantity}</TableCell>
                   <TableCell>{material.serial}</TableCell>
                   <TableCell>{material.batch}</TableCell>
-                  <TableCell>{material.certified ? '✅ Certified' : '❌ Not Certified'}</TableCell>
+                  <TableCell>{material.certified ? "✅ Certified" : "❌ Not Certified"}</TableCell>
                   <TableCell>{material.authority}</TableCell>
                   <TableCell>{material.price}</TableCell>
                   <TableCell>

@@ -1,12 +1,11 @@
-import Head from 'next/head';
+export const metadata = {
+  title: 'Air Works Supply Chain',
+  description: 'Streamlining Aviation Supply Chain with Blockchain',
+};
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-blue-900 flex flex-col items-center justify-center">
-      <Head>
-        <title>Air Works Supply Chain</title>
-        <meta name="description" content="Streamlining Aviation Supply Chain with Blockchain" />
-      </Head>
       <div className="relative">
         <svg className="w-64 h-24 animate-fly" viewBox="0 0 100 50">
           <path d="M10 25 L20 20 L30 25 L20 30 Z" fill="white" />

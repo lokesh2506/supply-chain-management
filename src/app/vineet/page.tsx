@@ -1,12 +1,13 @@
-'use client';
-import { useContext } from 'react';
-import { useRouter } from 'next/router';
-import { AuthContext } from '../../context/AuthContext';
-import SupplierDashboard from '../../components/SupplierDashboard';
-import ManufacturerDashboard from '../../components/ManufacturerDashboard';
-import MRODashboard from '../../components/MRODashboard';
-import AirlineDashboard from '../../components/AirlineDashboard';
-import RegulatoryAuthorityDashboard from '../../components/RegulatoryAuthorityDashboard';
+"use client"; // Add this at the top to enable Client Component behavior
+
+import { useContext } from "react";
+import { useRouter } from "next/navigation"; // Change to next/navigation
+import { AuthContext } from "../../context/AuthContext";
+import SupplierDashboard from "../../components/SupplierDashboard";
+import ManufacturerDashboard from "../../components/ManufacturerDashboard";
+import MRODashboard from "../../components/MRODashboard";
+import AirlineDashboard from "../../components/AirlineDashboard";
+import RegulatoryAuthorityDashboard from "../../components/RegulatoryAuthorityDashboard";
 
 export default function Dashboard() {
   const authContext = useContext(AuthContext);
@@ -17,23 +18,23 @@ export default function Dashboard() {
   const { isLoggedIn, role } = authContext;
 
   if (!isLoggedIn) {
-    router.push('/login');
+    router.push("/login"); // Use push from next/navigation
     return null;
   }
 
   switch (role) {
-    case 'Supplier':
+    case "Supplier":
       return <SupplierDashboard />;
-    case 'Manufacturer':
+    case "Manufacturer":
       return <ManufacturerDashboard />;
-    case 'MRO':
+    case "MRO":
       return <MRODashboard />;
-    case 'Airline':
+    case "Airline":
       return <AirlineDashboard />;
-    case 'Regulatory Authority':
+    case "Regulatory Authority":
       return <RegulatoryAuthorityDashboard />;
     default:
-      router.push('/login');
+      router.push("/login");
       return null;
   }
 }
