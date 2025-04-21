@@ -7,7 +7,7 @@ interface Aircraft {
   id: string;
   flight: string;
   parts: string;
-  hours: string;
+  hours: string; 
 }
 
 const AirlineDashboard: React.FC = () => {
