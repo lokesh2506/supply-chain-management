@@ -58,26 +58,64 @@ const SupplierDashboard: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const walletAddress = localStorage.getItem("walletAddress");
-      if (!walletAddress) {
-        setError("No wallet address found in localStorage");
-        return;
-      }
-
+      const walletAddress = localStorage.getItem("walletAddress") || "0xDummyWallet123";
       try {
-        const resMaterials = await fetch(`/api/supplier/materials?walletAddress=${walletAddress}`);
-        if (!resMaterials.ok) throw new Error(`Materials fetch failed: ${resMaterials.status}`);
-        const resOrders = await fetch(`/api/manufacturer/orders?walletAddress=${walletAddress}`);
-        if (!resOrders.ok) throw new Error(`Orders fetch failed: ${resOrders.status}`);
-        const resDeliveries = await fetch(`/api/supplier/deliveries?walletAddress=${walletAddress}`); // Fixed URL
-        if (!resDeliveries.ok) throw new Error(`Deliveries fetch failed: ${resDeliveries.status}`);
-        const resTransactions = await fetch(`/api/supplier/transactions?walletAddress=${walletAddress}`); // Adjusted URL
-        if (!resTransactions.ok) throw new Error(`Transactions fetch failed: ${resTransactions.status}`);
+        // Simulate API calls with dummy data
+        const dummyMaterials: Material[] = [
+          {
+            name: "Aluminum Alloy",
+            type: "Metal",
+            quantity: "500 kg",
+            serial: "MAT001",
+            batch: "BATCH2025A",
+            certified: true,
+            authority: "ISO Certified",
+            price: "$10/kg",
+          },
+          {
+            name: "Steel Rods",
+            type: "Metal",
+            quantity: "300 kg",
+            serial: "MAT002",
+            batch: "BATCH2025B",
+            certified: false,
+            authority: "Pending",
+            price: "$15/kg",
+          },
+        ];
+        const dummyOrders: Order[] = [
+          { id: "ORD001", material: "Aluminum Alloy", quantity: "200 kg", manufacturer: "MFG Inc.", address: "123 Main St" },
+          { id: "ORD002", material: "Steel Rods", quantity: "150 kg", manufacturer: "Steel Co.", address: "456 Oak Ave" },
+        ];
+        const dummyDeliveries: Delivery[] = [
+          {
+            id: "DEL001",
+            material: "Aluminum Alloy",
+            quantity: "200 kg",
+            manufacturer: "MFG Inc.",
+            status: "In Transit",
+            tracking: "TRK123456",
+            date: "2025-04-20",
+          },
+          {
+            id: "DEL002",
+            material: "Steel Rods",
+            quantity: "150 kg",
+            manufacturer: "Steel Co.",
+            status: "Delivered",
+            tracking: "TRK789101",
+            date: "2025-04-19",
+          },
+        ];
+        const dummyTransactions: Transaction[] = [
+          { id: "TXN001", date: "2025-04-18", from: "0xDummyWallet123", to: "MFG Inc.", price: "$2000" },
+          { id: "TXN002", date: "2025-04-17", from: "0xDummyWallet123", to: "Steel Co.", price: "$2250" },
+        ];
 
-        setMaterials(await resMaterials.json());
-        setOrders(await resOrders.json());
-        setDeliveries(await resDeliveries.json());
-        setTransactions(await resTransactions.json());
+        setMaterials(dummyMaterials);
+        setOrders(dummyOrders);
+        setDeliveries(dummyDeliveries);
+        setTransactions(dummyTransactions);
       } catch (error) {
         setError(error instanceof Error ? error.message : "Unknown error occurred");
         console.error("Fetch error:", error);
@@ -88,43 +126,44 @@ const SupplierDashboard: React.FC = () => {
   }, []);
 
   if (error) {
-    return <div>Error: {error}</div>; // Display error to user
+    return <div className="text-red-600 text-center p-4">Error: {error}</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <Header />
-      <div className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div className="bg-white p-4 rounded shadow">
-            <h2 className="text-lg font-bold">Total Materials</h2>
-            <p className="text-2xl">{materials.length}</p>
+      <div className="p-6">
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">Supplier Dashboard</h1>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+            <h2 className="text-xl font-semibold text-blue-600">Total Materials</h2>
+            <p className="text-4xl font-bold text-gray-900">{materials.length}</p>
           </div>
-          <div className="bg-white p-4 rounded shadow">
-            <h2 className="text-lg font-bold">Total Orders</h2>
-            <p className="text-2xl">{orders.length}</p>
+          <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+            <h2 className="text-xl font-semibold text-green-600">Total Orders</h2>
+            <p className="text-4xl font-bold text-gray-900">{orders.length}</p>
           </div>
-          <div className="bg-white p-4 rounded shadow">
-            <h2 className="text-lg font-bold">Total Transactions</h2>
-            <p className="text-2xl">{transactions.length}</p>
+          <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+            <h2 className="text-xl font-semibold text-purple-600">Total Transactions</h2>
+            <p className="text-4xl font-bold text-gray-900">{transactions.length}</p>
           </div>
         </div>
-        <TableContainer component={Paper} className="mb-4">
-          <h2 className="text-lg font-bold p-4">Current Orders</h2>
+        <TableContainer component={Paper} className="mb-6 shadow-lg rounded-lg">
+          <h2 className="text-2xl font-semibold text-gray-800 p-4">Current Orders</h2>
           <Table>
             <TableHead>
-              <TableRow>
-                <TableCell>Order ID</TableCell>
-                <TableCell>Material Name</TableCell>
-                <TableCell>Quantity Ordered</TableCell>
-                <TableCell>Manufacturer</TableCell>
-                <TableCell>Delivery Address</TableCell>
+              <TableRow className="bg-blue-100">
+                <TableCell className="font-bold text-gray-700">Order ID</TableCell>
+                <TableCell className="font-bold text-gray-700">Material Name</TableCell>
+                <TableCell className="font-bold text-gray-700">Quantity</TableCell>
+                <TableCell className="font-bold text-gray-700">Manufacturer</TableCell>
+                <TableCell className="font-bold text-gray-700">Address</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {orders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell>{order.id}</TableCell>
+                <TableRow key={order.id} className="hover:bg-gray-50">
+                  <TableCell className="py-3">{order.id}</TableCell>
                   <TableCell>{order.material}</TableCell>
                   <TableCell>{order.quantity}</TableCell>
                   <TableCell>{order.manufacturer}</TableCell>
@@ -134,26 +173,26 @@ const SupplierDashboard: React.FC = () => {
             </TableBody>
           </Table>
         </TableContainer>
-        <TableContainer component={Paper} className="mb-4">
-          <h2 className="text-lg font-bold p-4">Materials Catalog</h2>
+        <TableContainer component={Paper} className="mb-6 shadow-lg rounded-lg">
+          <h2 className="text-2xl font-semibold text-gray-800 p-4">Materials Catalog</h2>
           <Table>
             <TableHead>
-              <TableRow>
-                <TableCell>Material Name</TableCell>
-                <TableCell>Material Type</TableCell>
-                <TableCell>Quantity</TableCell>
-                <TableCell>Serial Number</TableCell>
-                <TableCell>Batch Number</TableCell>
-                <TableCell>Certification</TableCell>
-                <TableCell>Certified Authority</TableCell>
-                <TableCell>Price per kg</TableCell>
-                <TableCell>Actions</TableCell>
+              <TableRow className="bg-green-100">
+                <TableCell className="font-bold text-gray-700">Name</TableCell>
+                <TableCell className="font-bold text-gray-700">Type</TableCell>
+                <TableCell className="font-bold text-gray-700">Quantity</TableCell>
+                <TableCell className="font-bold text-gray-700">Serial</TableCell>
+                <TableCell className="font-bold text-gray-700">Batch</TableCell>
+                <TableCell className="font-bold text-gray-700">Certified</TableCell>
+                <TableCell className="font-bold text-gray-700">Authority</TableCell>
+                <TableCell className="font-bold text-gray-700">Price</TableCell>
+                <TableCell className="font-bold text-gray-700">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {materials.map((material) => (
-                <TableRow key={material.serial}>
-                  <TableCell>{material.name}</TableCell>
+                <TableRow key={material.serial} className="hover:bg-gray-50">
+                  <TableCell className="py-3">{material.name}</TableCell>
                   <TableCell>{material.type}</TableCell>
                   <TableCell>{material.quantity}</TableCell>
                   <TableCell>{material.serial}</TableCell>
@@ -162,7 +201,7 @@ const SupplierDashboard: React.FC = () => {
                   <TableCell>{material.authority}</TableCell>
                   <TableCell>{material.price}</TableCell>
                   <TableCell>
-                    <Button color="primary">Edit</Button>
+                    <Button color="primary" className="mr-2">Edit</Button>
                     <Button color="error">Delete</Button>
                   </TableCell>
                 </TableRow>
@@ -170,24 +209,24 @@ const SupplierDashboard: React.FC = () => {
             </TableBody>
           </Table>
         </TableContainer>
-        <TableContainer component={Paper} className="mb-4">
-          <h2 className="text-lg font-bold p-4">Deliveries</h2>
+        <TableContainer component={Paper} className="mb-6 shadow-lg rounded-lg">
+          <h2 className="text-2xl font-semibold text-gray-800 p-4">Deliveries</h2>
           <Table>
             <TableHead>
-              <TableRow>
-                <TableCell>Order ID</TableCell>
-                <TableCell>Material Name</TableCell>
-                <TableCell>Quantity</TableCell>
-                <TableCell>Manufacturer</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Tracking Number</TableCell>
-                <TableCell>Delivery Date</TableCell>
+              <TableRow className="bg-purple-100">
+                <TableCell className="font-bold text-gray-700">Order ID</TableCell>
+                <TableCell className="font-bold text-gray-700">Material</TableCell>
+                <TableCell className="font-bold text-gray-700">Quantity</TableCell>
+                <TableCell className="font-bold text-gray-700">Manufacturer</TableCell>
+                <TableCell className="font-bold text-gray-700">Status</TableCell>
+                <TableCell className="font-bold text-gray-700">Tracking</TableCell>
+                <TableCell className="font-bold text-gray-700">Date</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {deliveries.map((delivery) => (
-                <TableRow key={delivery.id}>
-                  <TableCell>{delivery.id}</TableCell>
+                <TableRow key={delivery.id} className="hover:bg-gray-50">
+                  <TableCell className="py-3">{delivery.id}</TableCell>
                   <TableCell>{delivery.material}</TableCell>
                   <TableCell>{delivery.quantity}</TableCell>
                   <TableCell>{delivery.manufacturer}</TableCell>
@@ -199,22 +238,22 @@ const SupplierDashboard: React.FC = () => {
             </TableBody>
           </Table>
         </TableContainer>
-        <TableContainer component={Paper}>
-          <h2 className="text-lg font-bold p-4">Transactions</h2>
+        <TableContainer component={Paper} className="shadow-lg rounded-lg">
+          <h2 className="text-2xl font-semibold text-gray-800 p-4">Transactions</h2>
           <Table>
             <TableHead>
-              <TableRow>
-                <TableCell>Order ID</TableCell>
-                <TableCell>Date</TableCell>
-                <TableCell>From (Supplier)</TableCell>
-                <TableCell>To (Manufacturer)</TableCell>
-                <TableCell>Price</TableCell>
+              <TableRow className="bg-yellow-100">
+                <TableCell className="font-bold text-gray-700">Order ID</TableCell>
+                <TableCell className="font-bold text-gray-700">Date</TableCell>
+                <TableCell className="font-bold text-gray-700">From</TableCell>
+                <TableCell className="font-bold text-gray-700">To</TableCell>
+                <TableCell className="font-bold text-gray-700">Price</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {transactions.map((transaction) => (
-                <TableRow key={transaction.id}>
-                  <TableCell>{transaction.id}</TableCell>
+                <TableRow key={transaction.id} className="hover:bg-gray-50">
+                  <TableCell className="py-3">{transaction.id}</TableCell>
                   <TableCell>{transaction.date}</TableCell>
                   <TableCell>{transaction.from}</TableCell>
                   <TableCell>{transaction.to}</TableCell>

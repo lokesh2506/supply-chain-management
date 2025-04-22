@@ -1,7 +1,6 @@
-"use client"; // Add this at the top to enable Client Component behavior
-
+"use client";
 import { useContext } from "react";
-import { useRouter } from "next/navigation"; // Change to next/navigation
+import { useRouter } from "next/navigation";
 import { AuthContext } from "../../context/AuthContext";
 import SupplierDashboard from "../../components/SupplierDashboard";
 import ManufacturerDashboard from "../../components/ManufacturerDashboard";
@@ -18,7 +17,7 @@ export default function Dashboard() {
   const { isLoggedIn, role } = authContext;
 
   if (!isLoggedIn) {
-    router.push("/login"); // Use push from next/navigation
+    router.push("/login");
     return null;
   }
 

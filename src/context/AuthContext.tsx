@@ -1,6 +1,6 @@
-'use client';
-import { createContext, useState, ReactNode, useContext } from 'react';
-import { ethers } from 'ethers';
+"use client";
+import { createContext, useState, ReactNode, useContext } from "react";
+import { ethers } from "ethers";
 
 interface AuthContextType {
   walletAddress: string | null;
@@ -18,21 +18,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [role, setRole] = useState<string | null>(null);
 
   const connectWallet = async (selectedRole: string): Promise<boolean> => {
-    if (typeof window.ethereum !== 'undefined') {
+    if (typeof window.ethereum !== "undefined") {
       try {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const accounts = await provider.send('eth_requestAccounts', []);
+        const accounts = await provider.send("eth_requestAccounts", []);
         setWalletAddress(accounts[0]);
         setRole(selectedRole);
         setIsLoggedIn(true);
-        localStorage.setItem('walletAddress', accounts[0]);
+        localStorage.setItem("walletAddress", accounts[0]);
         return true;
       } catch (error) {
-        console.error('Wallet connection failed:', error);
+        console.error("Wallet connection failed:", error);
         return false;
       }
     } else {
-      alert('Please install MetaMask!');
+      alert("Please install MetaMask!");
       return false;
     }
   };
@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setWalletAddress(null);
     setRole(null);
     setIsLoggedIn(false);
-    localStorage.removeItem('walletAddress');
+    localStorage.removeItem("walletAddress");
   };
 
   return (
